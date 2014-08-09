@@ -1,12 +1,4 @@
 /**
- * Module dependencies
- */
-
-var passport = require('passport');
-
-
-
-/**
  * UserController
  *
  * @description :: Server-side logic for managing users
@@ -19,8 +11,9 @@ module.exports = {
    * `UserController.login()`
    */
   login: function (req, res) {
-    return res.json({
-      todo: 'login() is not implemented yet!'
+    return res.login({
+      successRedirect: '/',
+      failureRedirect: '/user/login'
     });
   },
 
