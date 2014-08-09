@@ -1,4 +1,12 @@
 /**
+ * Module dependencies
+ */
+
+var passport = require('passport');
+
+
+
+/**
  * UserController
  *
  * @description :: Server-side logic for managing users
