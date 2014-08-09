@@ -111,7 +111,10 @@ function _extendReq(req) {
     if (typeof done != 'function') { throw new Error('req#login requires a callback function'); }
 
     req._passport.instance.serializeUser(user, req, function(err, obj) {
-      if (err) { req[property] = null; return done(err); }
+      if (err) {
+        req[property] = null;
+        return done(err);
+      }
       req._passport.session.user = obj;
       done();
     });

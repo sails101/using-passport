@@ -12,7 +12,7 @@ module.exports = {
    */
   login: function (req, res) {
     return res.login({
-      successRedirect: '/'
+      successRedirect: '/success'
     });
   },
 
@@ -21,9 +21,8 @@ module.exports = {
    * `UserController.logout()`
    */
   logout: function (req, res) {
-    return res.json({
-      todo: 'logout() is not implemented yet!'
-    });
+    req.logout();
+    return res.ok('Logged out successfully.');
   },
 
 
@@ -31,8 +30,12 @@ module.exports = {
    * `UserController.signup()`
    */
   signup: function (req, res) {
-    return res.json({
-      todo: 'signup() is not implemented yet!'
+    User.create(req.params.all()).exec(function (err, user) {
+      if (err) return res.negotiate(err);
+      req.login(user, function (err){
+        if (err) return res.negotiate(err);
+        return res.redirect('/welcome');
+      });
     });
   }
 };

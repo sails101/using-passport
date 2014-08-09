@@ -8,6 +8,9 @@
  *
  */
 module.exports = function(req, res, next) {
+
+  // If `req.user` exists, that means the passport middleware was able to
+  // inflate/hydrate/deserialize a valid user from the session.
   if (req.user) return next();
-  return res.forbidden('You are not permitted to perform this action without authenticating.');
+  return res.unauthorized();
 };
