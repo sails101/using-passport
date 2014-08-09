@@ -110,9 +110,8 @@ function _extendReq(req) {
     if (!req._passport) { throw new Error('passport.initialize() middleware not in use'); }
     if (typeof done != 'function') { throw new Error('req#login requires a callback function'); }
 
-    var self = req;
     req._passport.instance.serializeUser(user, req, function(err, obj) {
-      if (err) { self[property] = null; return done(err); }
+      if (err) { req[property] = null; return done(err); }
       req._passport.session.user = obj;
       done();
     });

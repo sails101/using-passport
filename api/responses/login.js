@@ -28,7 +28,13 @@ module.exports = function login(opts) {
 
   }, opts || {});
 
-  sails.passport.authenticate('local', function (err, user){
+
+  // Just to be crystal clear about what's going on, all this method does is
+  // call the "verify" function of our strategy (you could do this manaully yourself-
+  // just talk to your user Model)
+  sails.passport.authenticate('local', function customAuth(err, user){
+    console.log('req.user:',req.user);
+    console.log('user from call to authenticate:',user);
     if (err) return res.negotiate(err);
     if (!user) return res.badRequest('Invalid username/password combination.');
 
@@ -42,7 +48,6 @@ module.exports = function login(opts) {
     // the session store. You could do exactly the same thing yourself, e.g.:
     // `User.req.session.me = user;`
     var passportLogin = req.login;
-    console.log('req.user:',req.user);
     return passportLogin(user, function (err) {
       if (err) return res.negotiate(err);
       return res.redirect(passportOpts.successRedirect);

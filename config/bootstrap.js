@@ -36,6 +36,7 @@ module.exports.bootstrap = function(cb) {
 
   // Build our strategy and register it w/ passport
   sails.passport.use('local', new (require('passport-local').Strategy)(function verify(username, password, verify_cb) {
+    console.log('VERIFYING:',username,password);
 
     // Find the user by username.  If there is no user with the given
     // username, or the password is not correct, set the user to `false` to
