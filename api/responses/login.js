@@ -5,6 +5,12 @@
 var passport = require('passport');
 var PassportLocal = require('passport-local');
 
+// For reference, to get the constructor:
+// var PassportAuthenticator = require('passport').constructor;
+// -or-
+// var PassportAuthenticator = require('passport').Passport;
+// -or-
+// var PassportAuthenticator = require('passport').Authenticator;
 
 
 /**
@@ -27,8 +33,13 @@ module.exports = function login(opts) {
   var passportOpts = _.extend({
   }, opts || {});
 
-  // Build our strategy
-  var strategy = new PassportLocal.Strategy(function verifyFn(username, password, verify_cb) {
+  // The name of our strategy
+  var STRATEGY = 'local';
+
+  // Build our strategy and register it w/ passport
+  // (unfortunately the direct pass-it-in-to-authenticate usage
+  //  no longer works in the latest version of passport on npm)
+  passport.use('local', function verify(username, password, verify_cb) {
 
     // Find the user by username.  If there is no user with the given
     // username, or the password is not correct, set the user to `false` to
@@ -51,7 +62,7 @@ module.exports = function login(opts) {
   });
 
   // Configure passport's login with our strategy
-  var configuredLogin = passport.authenticate(strategy, function (err, user, info){
+  var configuredLogin = passport.authenticate(STRATEGY, function (err, user, info){
     console.log('RUNNING THE PASSPORT thing');
     if (err) return res.negotiate(err);
     if (!user) return res.forbidden(info);
