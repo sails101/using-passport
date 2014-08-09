@@ -21,10 +21,16 @@ and signup endpoints.
 
 ### Step 1: Add Passport as a dependency
 
-> See [relevant commit](https://github.com/sails101/using-passport/commit/4a86cae8fbcc3d4281c391cc62f683a750fd34ec#diff-d41d8cd98f00b204e9800998ecf8427e)
+> See [relevant](https://github.com/sails101/using-passport/commit/4a86cae8fbcc3d4281c391cc62f683a750fd34ec#diff-d41d8cd98f00b204e9800998ecf8427e) [commits](bdf3360a9b04ea52434b9766d472bd3aaa32a868)
 
 ```shell
 $ npm install passport --save
+```
+
+We'll also want to add the dependency of the Passport strategy we're using.  In this case, that means installing `passport-local`:
+
+```shell
+$ npm install passport-local --save
 ```
 
 
