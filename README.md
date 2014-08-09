@@ -19,7 +19,7 @@ and signup endpoints.
 > ~Mike
 
 
-### Step 1: Add Passport as a dependency
+## Step 1: Add Passport as a dependency
 
 > See [relevant commit](https://github.com/sails101/using-passport/commit/4a86cae8fbcc3d4281c391cc62f683a750fd34ec#diff-d41d8cd98f00b204e9800998ecf8427e)
 
@@ -28,7 +28,7 @@ $ npm install passport --save
 ```
 
 
-### Step 2: Create `User.js` and `UserController.js`
+## Step 2: Create `User.js` and `UserController.js`
 
 > See [relevant commit](https://github.com/sails101/using-passport/commit/73cc32ac53baf0c305bd17a3259fae740c5706fc#diff-d41d8cd98f00b204e9800998ecf8427e)
 
@@ -41,7 +41,7 @@ $ sails generate api user login logout signup
 
 Now let's build each of the API actions.
 
-### Step 3: Login
+## Step 3: Login
 
 > See [relevant commit](https://github.com/sails101/using-passport/commit/dba3e578924d90a7f4977b6d09f3104e745bdfc5)
 
@@ -128,16 +128,16 @@ This affords us a handful of benefits:
 
 
 
-### Step 5: Logout
+## Step 5: Logout
 
 TODO: ...
 
-### Step 6: Signup
+## Step 6: Signup
 
 TODO: ...
 
 
-### Step 7: Build a quick front-end
+## Step 7: Build a quick front-end
 
 So we're about ready to start trying this stuff out.
 
@@ -155,7 +155,7 @@ TODO: ...
 
 
 
-### Step 8: Configure Passport's middleware
+## Step 8: Configure Passport's middleware
 
 Middleware is a simple concept, but it is overloaded to mean a lot of different things.  Be sure and check out the section on middleware in the conceptual docs on sailsjs.org a quick intro and some high-level analysis of what middleware means in the context of Sails.
 
@@ -194,5 +194,27 @@ The code above works, but once again, we can do better.
 > ##### Quick aside: Building a custom hook
 >
 > TODO: ...
+
+
+
+
+
+## Conclusion
+
+
+##### So what is Passport doing?
+
+Passport does a lot of different things, and some of them in a few different ways.
+
+
+##### Passport's methods
+
+ Method                                         | What it does
+ ---------------------------------------------- | ------------------------------------------------------------------------------------------------
+ `req.authenticate(strgy,cb)(req,res,mysteryFn)`| Parses credentials from the session.  If you're not logged in, it parses credentials from the request, then calls the `verify()` fn you set up when configuring the strategy.  Finally it calls its callback (`cb`).
+ `req.login()`                                  | Calls the `seralizeUser()` fn you set up when configuring passport and stuffs the user in the session.
+ `req.logout()`                                 | Calls the `deseralizeUser()` fn you set up when configuring passport and rips the user out of the session.
+ `req.logout()`                                 | Calls the `deseralizeUser()` fn you set up when configuring passport.
+
 
 

@@ -12,8 +12,7 @@ module.exports = {
    */
   login: function (req, res) {
     return res.login({
-      successRedirect: '/',
-      failureRedirect: '/user/login'
+      successRedirect: '/'
     });
   },
 
