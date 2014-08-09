@@ -22,6 +22,17 @@
 
 module.exports.routes = {
 
+
+  '/*': function configurePassport(req, res, next) {
+    require('passport').initialize()(req,res,function(err){
+      if (err) return res.negotiate(err);
+      require('passport').session()(req,res, function (err){
+        if (err) return res.negotiate(err);
+        next();
+      });
+    });
+  },
+
   /***************************************************************************
   *                                                                          *
   * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *
