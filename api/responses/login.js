@@ -3,6 +3,7 @@
  */
 
 var passport = require('passport');
+var PassportLocal = require('passport-local');
 
 
 
@@ -26,8 +27,32 @@ module.exports = function login(opts) {
   var passportOpts = _.extend({
   }, opts || {});
 
-  // Configure passport's login
-  var configuredLogin = passport.authenticate('session', function (err, user, info){
+  // Build our strategy
+  var strategy = new PassportLocal.Strategy(function verifyFn(username, password, verify_cb) {
+
+    // Find the user by username.  If there is no user with the given
+    // username, or the password is not correct, set the user to `false` to
+    // indicate failure and set a flash message.  Otherwise, return the
+    // authenticated `user`.
+    User.findOne({
+      username: username,
+      password: password
+    }, function(err, user) {
+      // Send internal db errors back up (passes through back to our main app)
+      if (err) return verify_cb(err);
+
+      // Passport wants us to send `false` as the second argument to the "verify_cb"
+      // to indicate that the authentication "failed".
+      if (!user) return verify_cb(null, false, { message: 'Unknown username/password combo.' });
+
+      // Otherwise, we pass back the user object itself to indicate success.
+      return verify_cb(null, user);
+    });
+  });
+
+  // Configure passport's login with our strategy
+  var configuredLogin = passport.authenticate(strategy, function (err, user, info){
+    console.log('RUNNING THE PASSPORT thing');
     if (err) return res.negotiate(err);
     if (!user) return res.forbidden(info);
     req.logIn(user, function (err) {
