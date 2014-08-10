@@ -1,12 +1,4 @@
 /**
- * Module dependencies
- */
-
-var Passport = require('passport').constructor;
-
-
-
-/**
  * Bootstrap
  * (sails.config.bootstrap)
  *
@@ -19,22 +11,5 @@ var Passport = require('passport').constructor;
 
 module.exports.bootstrap = function(cb) {
 
-  // Create a passport instance to use
-  sails.passport = new Passport();
-
-  // Teach our Passport how to serialize/dehydrate a user object into an id
-  sails.passport.serializeUser(function(user, done) {
-    done(null, user.id);
-  });
-
-  // Teach our Passport how to deserialize/hydrate an id back into a user object
-  sails.passport.deserializeUser(function(id, done) {
-    User.findOne(id, function(err, user) {
-      done(err, user);
-    });
-  });
-
-  // It's very important to trigger this callback method when you are finished
-  // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
   cb();
 };
