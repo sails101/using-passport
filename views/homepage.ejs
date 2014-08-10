@@ -15,6 +15,11 @@
 
     <h1>Using Passport With Sails</h1>
 
+    <% if (req.user) { %>
+    <a href="/logout">Logout</a>
+    <% } else { %>
+    <a href="/login">Login</a> | <a href="/signup">Signup</a>
+    <% } %>
 
 
     <!--SCRIPTS-->
