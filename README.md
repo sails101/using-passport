@@ -7,36 +7,14 @@ For many Sails apps, Passport is overkill- it's quite easy to set up local authe
 
 But in scenarios where you're doing authentication across multiple providers, Passport can make sense, and save you a lot of time.
 
-This tutorial covers installing Passport in your Sails app, configuring it with the "Local" strategy, and then implementing basic login, logout,
-and signup endpoints.
-
-> Warning: There are a number of outstanding issues in various Passport "strategy" modules.
-> In general, the strategy modules work great, and as open-source users, we must be tolerant
-> of limited supporting docs, especially with smaller modules.  Fortunately, we also have the
-> opportunity to help contribute to the Passport ecosystem by filling gaps in documentation and
-> fixing these issues as we come across them.
->
-> ~Mike
+This tutorial takes advantage of a quick passport hook I put together to eliminate some of the more confusing aspects of integration with Sails from user-space.  For an in-depth tutorial on how the hook ended up getting built, check out [ORIGINAL_PREHOOK_WALKTHROUGH.md](https://github.com/sails101/using-passport/blob/master/ORIGINAL_PREHOOK_WALKTHROUGH.md).
 
 
-## Step 1: Add Passport as a dependency
+## Step 1: Install the passport hook
 
-> See [relevant](https://github.com/sails101/using-passport/commit/4a86cae8fbcc3d4281c391cc62f683a750fd34ec#diff-d41d8cd98f00b204e9800998ecf8427e) [commits](https://github.com/sails101/using-passport/commit/bdf3360a9b04ea52434b9766d472bd3aaa32a868)
-
-```shell
-$ npm install passport --save
-```
-
-We'll also want to add the dependency of the Passport strategy we're using.  In this case, that means installing `passport-local`:
-
-```shell
-$ npm install passport-local --save
-```
-
+TODO: ...
 
 ## Step 2: Create `User.js` and `UserController.js`
-
-> See [relevant commit](https://github.com/sails101/using-passport/commit/73cc32ac53baf0c305bd17a3259fae740c5706fc#diff-d41d8cd98f00b204e9800998ecf8427e)
 
 We'll add a stub `login()`, `logout()`, and `signup()` action while we're at it.
 
@@ -49,89 +27,13 @@ Now let's build each of the API actions.
 
 ## Step 3: Login
 
-> See [relevant commit](https://github.com/sails101/using-passport/commit/dba3e578924d90a7f4977b6d09f3104e745bdfc5)
-
-So let's do the simplest possible thing w/ passport.  We'll try to log in the requesting user using the local strategy.
-
-If the user login is successful, we'll redirect to `/secure`.  Otherwise, we'll redirect to the homepage.
-
-```js
-require('passport').authenticate('local', {
-  successRedirect: '/secure',
-  failureRedirect: '/'
-})(req, res, function errorHandler(err) {
-  if (err) return res.negotiate(err);
-  return res.notFound();
-});
-```
-
-> Notice that we passed in an anonymous function as the third argument to `.authenticate()`.
-> This is so that we can handle any unexpected errors that might occur during authentication.
-
-We could actually put the code above in our login action and it would work just fine. But instead, let's make things a little more reusable.
-
-With that goal in mind, we'll start off by building a custom response that we can call as `res.login()`.
-
-This will allow us to simplify our code in UserController to the following:
+If the user login is successful, we'll redirect to `/`.
 
 ```js
 return res.login({
-  successRedirect: '/secure',
-  failureRedirect: '/'
+  successRedirect: '/'
 });
 ```
-
-This affords us a handful of benefits:
-
-1. Our controller action now has less code (see the section on [thin controllers]() in the conceptual docs on sailsjs.org)
-2. Because Passport actually does the responding for us in its `authenticate` method, creating a custom response is a great way to signal this to other developers and our forgetful future-selves
-3. Now our business logic in the controller action is not tied to any particular login strategy.  We could switch passport strategies (or even use a different module alogether) without changing any application logic.
-4. We can now call res.login() from any policy, controller, or custom response.
-5. We now have a way to pass configuration to our login, so it can be extended and reused in future code- even beyond this particular app.
-
-> ##### Quick aside: Building a custom response
->
-> TODO: Maybe pull this out into a separate tutorial? anyone want to help?
->
-> Building a custom response is pretty easy.
->
-> Start by creating an empty file in `api/responses/login.js`. (because the basename of the file is `login`, the function exported by this file will be available as `res.login()`)
->
-> ```shell
-> $ mkdir -p api/responses;touch api/responses/login.js
-> ```
->
-> In that file, add the following boilerplate which exports a function and gets access to the req and res objects.
->
-> Custom responses don't receive `req` and `res` as arguments to make it simple to understand how you can exert complete control over their usage.
->
-> ```js
-> module.exports = function login() {
->
->   // Get access to `req` and `res`
->   var req = this.req;
->   var res = this.res;
->
->   // ...
->   // TODO: send a response of some kind here
-> };
-> ```
->
-> So now we just `require('passport')` and call the `authenticate` method with our desired strategy:
->
-> ```js
-> require('passport').authenticate('local', {
->   successRedirect: '/secure',
->   failureRedirect: '/'
-> })(req, res, function errorHandler(err) {
->   if (err) return res.negotiate(err);
->   return res.notFound();
-> });
-> ```
->
-> Finally, we can make some improvements, like exposing passport's `successRedirect` and `failureRedirect` as options.
-> See [`api/responses/login.js`]() in this repo for the completed version of this response w/ code comments.
-
 
 
 ## Step 5: Logout
