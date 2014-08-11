@@ -88,7 +88,7 @@ Let's create an empty directory at `views/user/`, then create two files: `user/l
 Next, let's set up some friendly URLs as custom routes in our `config/routes.js` file:
 
 ```
-module.exports = {
+module.exports.routes = {
   '/': { view: 'homepage' },
   'get /login': { view: 'user/login' },
   'get /signup': { view: 'user/signup' },
