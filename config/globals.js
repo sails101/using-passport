@@ -23,7 +23,7 @@ module.exports.globals = {
 
   /****************************************************************************
   *                                                                           *
-  * Whether to expose the locally-installed `async` as a global variable
+  * Whether to expose the locally-installed `async` as a global variable      *
   * (`async`), making it accessible throughout your app.                      *
   * (See the link above for help.)                                            *
   *                                                                           *
@@ -47,6 +47,6 @@ module.exports.globals = {
   *                                                                           *
   ****************************************************************************/
 
-  sails: true
+  sails: true,
 
 };
