@@ -23,24 +23,11 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  // '*': true,
+  '*': 'isLoggedIn',
 
-  /***************************************************************************
-  *                                                                          *
-  * Here's an example of mapping some policies to run before a controller    *
-  * and its actions                                                          *
-  *                                                                          *
-  ***************************************************************************/
-  // UserController: {
+  UserController: {
+    login: true,
+    signup: true,
+  }
 
-    // Require requests to come from a logged-in user for most actions
-    // '*': 'isLoggedIn',
-
-    // But we'll let anyone access the 'login' action
-    // 'login'  : true
-
-    // And we'll only let admins delete users
-    // 'destroy': 'isAdmin'
-
-  // }
 };

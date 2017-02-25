@@ -2,6 +2,7 @@
  * Module dependencies
  */
 
+var flaverr = require('flaverr');
 var Passport = require('passport').constructor;
 
 
@@ -22,7 +23,6 @@ module.exports = function (sails){
     },
 
     initialize: function (cb) {
-      var err;
 
       // Validate `userModelIdentity` config
       if (typeof sails.config.passport.userModelIdentity !== 'string') {
@@ -31,15 +31,10 @@ module.exports = function (sails){
       sails.config.passport.userModelIdentity = sails.config.passport.userModelIdentity.toLowerCase();
 
 
-
       // We must wait for the `orm` hook before acquiring our user model from `sails.models`
       // because it might not be ready yet.
       if (!sails.hooks.orm) {
-        err = new Error();
-        err.code = 'E_HOOK_INITIALIZE';
-        err.name = 'Passport Hook Error';
-        err.message = 'The "passport" hook depends on the "orm" hook- cannot load the "passport" hook without it!';
-        return cb(err);
+        return cb(flaverr('E_HOOK_INITIALIZE', new Error('The "passport" hook depends on the "orm" hook- cannot load the "passport" hook without it!')));
       }
       sails.after('hook:orm:loaded', function (){
 
@@ -47,14 +42,15 @@ module.exports = function (sails){
         var UserModel = sails.models[sails.config.passport.userModelIdentity];
 
         if (!UserModel) {
-          err = new Error();
-          err.code = 'E_HOOK_INITIALIZE';
-          err.name = 'Passport Hook Error';
-          err.message = 'Could not load the passport hook because `sails.config.passport.userModelIdentity` refers to an unknown model: "'+sails.config.passport.userModelIdentity+'".';
-          if (sails.config.passport.userModelIdentity === 'user') {
-            err.message += '\nThis option defaults to `user` if unspecified or invalid- maybe you need to set or correct it?';
-          }
-          return cb(err);
+          return cb(flaverr('E_HOOK_INITIALIZE', new Error(
+            'Could not load the passport hook because `sails.config.passport.userModelIdentity` '+
+            'refers to an unknown model: "'+sails.config.passport.userModelIdentity+'".'+
+            (
+              sails.config.passport.userModelIdentity === 'user' ? ('\n'+
+              'This option defaults to `user` if unspecified or invalid- '+
+              'maybe you need to set or correct it?') : ''
+            )
+          )));
         }
 
         // Create a passport instance to use
@@ -63,7 +59,7 @@ module.exports = function (sails){
         // Teach our Passport how to serialize/dehydrate a user object into an id
         sails.passport.serializeUser(function(user, done) {
           console.log('Using primary key', UserModel.primaryKey, 'with record:',user);
-          done(null, user[UserModel.primaryKey]);
+          done(undefined, user[UserModel.primaryKey]);
         });
 
         // Teach our Passport how to deserialize/hydrate an id back into a user object
@@ -73,11 +69,45 @@ module.exports = function (sails){
           });
         });
 
+        // Build our strategy and register it w/ passport
+        sails.passport.use('local', new (require('passport-local').Strategy)({
+
+          // These are the "default username/password fields" in passport-local
+          // (see the "Parameters" section here: http://passportjs.org/guide/username-password/)
+          usernameField: 'username',
+          passwordField: 'password'
+          // Under the covers, Passport is just doing:
+          // `req.param(opts.usernameField)`
+          // `req.param(opts.passwordField)`
+
+        }, function verify(username, password, done) {
+
+          // Find the user by username.  If there is no user with the given
+          // username, or the password is not correct, set the user to `false` to
+          // indicate failure and set a flash message.  Otherwise, return the
+          // authenticated `user`.
+          User.findOne({
+            username: username,
+            password: password
+          }, function(err, user) {
+            // Send internal db errors back up (passes through back to our main app)
+            if (err) { return done(err); }
+
+            // Passport wants us to send `false` as the second argument to
+            // this callback to indicate that the authentication "failed".
+            if (!user) { return done(undefined, false, { message: 'Unknown username/password combo.' }); }
+
+            // Otherwise, we pass back the data we want to store in the session
+            // (Passport assumes that, since it's truthy, it indicates success.)
+            return done(undefined, user);
+          });
+        }));
+
         // It's very important to trigger this callback method when you are finished
         // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
         cb();
 
-      });
+      });//</after orm loaded>
 
     },
 

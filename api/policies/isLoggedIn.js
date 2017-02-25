@@ -4,7 +4,7 @@
  * A simple policy that allows any request from an authenticated user.
  *
  * For more about how this policy works and how to use it, see:
- *   http://sailsjs.com/anatomy/api/policies/is-logged-in-js
+ *   http://sailsjs.com/anatomy/api/policies/isLoggedIn.js
  */
 module.exports = function isLoggedIn(req, res, next) {
 
@@ -17,6 +17,9 @@ module.exports = function isLoggedIn(req, res, next) {
 
   //--•
   // Otherwise, this request did not come from a logged-in user.
-  return res.forbidden();
+  if (req.wantsJSON) {
+    return res.forbidden();
+  }
+  return res.redirect('/');
 
 };
