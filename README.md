@@ -12,7 +12,7 @@ This tutorial takes advantage of a quick passport hook I put together to elimina
 
 ## Step 1: Install the passport hook
 
-TODO: ...
+TODO ...
 
 ## Step 2: Create `User.js` and `UserController.js`
 
